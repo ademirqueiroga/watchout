@@ -1,0 +1,15 @@
+plugins {
+    id 'kotlin'
+    id("com.google.devtools.ksp").version("1.7.10-1.0.6") // Or latest version of KSP
+}
+
+dependencies {
+    implementation Dependencies.coroutines
+    implementation Dependencies.retrofit
+    implementation Dependencies.retrofitMoshiConverter
+    implementation Dependencies.moshi
+    implementation Dependencies.roomCommon
+    implementation Dependencies.pagingCommonKtx
+    ksp Dependencies.moshiCodeGen
+    ksp Dependencies.roomCompiler
+}

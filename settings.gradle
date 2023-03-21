@@ -1,0 +1,23 @@
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+        google()
+        mavenCentral()
+        mavenLocal()
+    }
+}
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
+rootProject.name = "WatchOut"
+include ':app'
+include ':data'
+include ':data:android'
+include ':common-ui-compose'
+include ':ui-movie'
+include ':ui-people'
+include ':ui-tvshow'

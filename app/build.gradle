@@ -1,0 +1,85 @@
+plugins {
+    id 'com.android.application'
+    id 'org.jetbrains.kotlin.android'
+    id("com.google.devtools.ksp").version("1.7.10-1.0.6") // Or latest version of KSP
+    id("kotlin-parcelize")
+}
+
+android {
+    compileSdk 33
+
+    defaultConfig {
+        applicationId "com.admqueiroga.watchout"
+        minSdk 23
+        targetSdk 33
+        versionCode 1
+        versionName "1.0"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        vectorDrawables {
+            useSupportLibrary true
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    flavorDimensions "device"
+    productFlavors {
+        television {
+            applicationIdSuffix ".tv"
+            dimension "device"
+        }
+        mobile {
+            applicationIdSuffix ".mobile"
+            dimension "device"
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
+    }
+    kotlinOptions {
+        jvmTarget = '11'
+        freeCompilerArgs += [
+                "-Xjvm-default=all",
+        ]
+    }
+    buildFeatures {
+        compose true
+    }
+    composeOptions {
+        kotlinCompilerExtensionVersion "1.3.0"
+    }
+    packagingOptions {
+        resources {
+            excludes += '/META-INF/{AL2.0,LGPL2.1}'
+        }
+    }
+    namespace 'com.admqueiroga.watchout'
+}
+
+dependencies {
+
+    implementation project(":ui-movie")
+    implementation project(":ui-people")
+    implementation project(":ui-tvshow")
+    implementation project(":common-ui-compose")
+    implementation project(":data:android")
+
+    implementation 'androidx.core:core-ktx:1.9.0'
+    implementation 'androidx.activity:activity-compose:1.6.1'
+    implementation('androidx.fragment:fragment-ktx:1.5.5')
+    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.5.1'
+    implementation('androidx.paging:paging-compose:1.0.0-alpha17')
+    implementation("androidx.paging:paging-runtime:3.1.1")
+    implementation('androidx.navigation:navigation-compose:2.5.3')
+
+    implementation Dependencies.composeUi
+    implementation Dependencies.composeMaterial
+    implementation Dependencies.composePreview
+
+}
