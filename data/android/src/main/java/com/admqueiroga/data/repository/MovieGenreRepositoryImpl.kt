@@ -22,12 +22,20 @@ class MovieGenreRepositoryImpl(
     override suspend fun insert(genre: MovieGenre) =
         movieGenreDao.insert(genre)
 
+    override suspend fun get(genreId: Long): MovieGenre {
+        return movieGenreDao.get(genreId = genreId)
+    }
+
     override fun flow(): Flow<List<MovieGenre>> = movieGenreDao.flow()
         .onStart {
-            val dirtyCache = true // TODO
+            val dirtyCache = true // TODO: Figure out when to invalidate cache
             if (dirtyCache) {
-                val genresResponse = tmdbApi.genres().getOrThrow()
-                movieGenreDao.insert(genresResponse.genres.map(::mapToMovieGenre))
+                try {
+                    val genresResponse = tmdbApi.genres().getOrThrow()
+                    movieGenreDao.insert(genresResponse.genres.map(::mapToMovieGenre))
+                } catch (e: Exception) {
+                    // Ignore
+                }
             }
         }
         .distinctUntilChanged()

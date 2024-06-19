@@ -1,12 +1,12 @@
 plugins {
     id("com.android.library")
     id("org.jetbrains.kotlin.android")
-    id("com.google.devtools.ksp").version("1.7.10-1.0.6") // Or latest version of KSP
+    id("com.google.devtools.ksp").version("2.0.0-1.0.21") // Or latest version of KSP
 }
 
 android {
     namespace = "com.admqueiroga.android"
-    compileSdk = 33
+    compileSdk = 34
 
     defaultConfig {
         minSdk = 23
@@ -29,14 +29,14 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 }
 
 dependencies {
     api(project(":data"))
-    implementation("androidx.core:core-ktx:1.9.0")
+    implementation("androidx.core:core-ktx:1.13.1")
     implementation(Dependencies.pagingCommonKtx)
     api(Dependencies.room)
     implementation(Dependencies.roomKtx)

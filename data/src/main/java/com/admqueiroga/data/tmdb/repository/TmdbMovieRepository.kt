@@ -15,12 +15,12 @@ class TmdbMovieRepository(
     suspend fun movies(
         page: Int,
         genres: List<TmdbMovieGenre>?,
-    ) = api.find(page, genres?.joinToString(separator = "|") { it.id.toString() })
+    ) = api.discover(page, genres?.joinToString(separator = "|") { it.id.toString() })
 
     suspend fun movies(
         page: Int,
         vararg genreIds: Long,
-    ) = api.find(page, genreIds.joinToString(separator = "|"))
+    ) = api.discover(page, genreIds.joinToString(separator = "|"))
 
     suspend fun popular(page: Int? = null) = api.popular(page)
 

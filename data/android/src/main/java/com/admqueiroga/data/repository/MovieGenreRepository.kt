@@ -9,6 +9,8 @@ interface MovieGenreRepository {
 
     suspend fun insert(genre: MovieGenre)
 
+    suspend fun get(genreId: Long): MovieGenre
+
     fun flow(): Flow<List<MovieGenre>>
 
 }

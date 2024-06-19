@@ -6,10 +6,12 @@ import androidx.lifecycle.viewModelScope
 import com.admqueiroga.data.NetworkResponse
 import com.admqueiroga.data.tmdb.TmdbApiClient
 import com.admqueiroga.data.tmdb.model.TmdbMovieDetail
+import com.admqueiroga.data.tmdb.model.TmdbMovieImages
 import com.admqueiroga.data.tmdb.repository.TmdbMovieRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 class MovieDetailViewModel(private val movieId: Long) : ViewModel() {
@@ -19,8 +21,13 @@ class MovieDetailViewModel(private val movieId: Long) : ViewModel() {
     private val _details = MutableStateFlow<TmdbMovieDetail?>(null)
     val details: Flow<TmdbMovieDetail?> = _details
 
+    private val _images = MutableStateFlow<TmdbMovieImages?>(null)
+    val images: StateFlow<TmdbMovieImages?> = _images
+
     fun loadDetails() = viewModelScope.launch(Dispatchers.IO) {
         _details.value = (repo.detail(movieId) as? NetworkResponse.Success)?.body
+        // TODO: API CALL FIX
+        _images.value = (TmdbApiClient().movies.images(movieId) as? NetworkResponse.Success)?.body
     }
 
     class Factory(private val movieId: Long) : ViewModelProvider.Factory {

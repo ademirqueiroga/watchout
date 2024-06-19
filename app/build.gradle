@@ -1,17 +1,20 @@
+import Dependencies
+
 plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
-    id("com.google.devtools.ksp").version("1.7.10-1.0.6") // Or latest version of KSP
+    id("com.google.devtools.ksp").version("2.0.0-1.0.21") // Or latest version of KSP
     id("kotlin-parcelize")
+    id 'org.jetbrains.kotlin.plugin.compose'
 }
 
 android {
-    compileSdk 33
+    compileSdk 34
 
     defaultConfig {
         applicationId "com.admqueiroga.watchout"
         minSdk 23
-        targetSdk 33
+        targetSdk 34
         versionCode 1
         versionName "1.0"
 
@@ -25,6 +28,7 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.debug
         }
     }
     flavorDimensions "device"
@@ -32,27 +36,26 @@ android {
         television {
             applicationIdSuffix ".tv"
             dimension "device"
+            dependencies {
+                implementation Dependencies.composeTv
+                implementation Dependencies.composeTvMaterial
+            }
         }
         mobile {
             applicationIdSuffix ".mobile"
             dimension "device"
         }
     }
+
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_11
-        targetCompatibility JavaVersion.VERSION_11
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
     kotlinOptions {
-        jvmTarget = '11'
+        jvmTarget = '17'
         freeCompilerArgs += [
                 "-Xjvm-default=all",
         ]
-    }
-    buildFeatures {
-        compose true
-    }
-    composeOptions {
-        kotlinCompilerExtensionVersion "1.3.0"
     }
     packagingOptions {
         resources {
@@ -67,19 +70,21 @@ dependencies {
     implementation project(":ui-movie")
     implementation project(":ui-people")
     implementation project(":ui-tvshow")
+    implementation project(':ui-discover')
     implementation project(":common-ui-compose")
     implementation project(":data:android")
 
-    implementation 'androidx.core:core-ktx:1.9.0'
-    implementation 'androidx.activity:activity-compose:1.6.1'
-    implementation('androidx.fragment:fragment-ktx:1.5.5')
-    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.5.1'
-    implementation('androidx.paging:paging-compose:1.0.0-alpha17')
-    implementation("androidx.paging:paging-runtime:3.1.1")
-    implementation('androidx.navigation:navigation-compose:2.5.3')
+    implementation 'androidx.core:core-ktx:1.13.1'
+    implementation 'androidx.activity:activity-compose:1.9.0'
+    implementation('androidx.fragment:fragment-ktx:1.7.1')
+    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.8.1'
+    implementation('androidx.paging:paging-compose:3.3.0')
+    implementation("androidx.paging:paging-runtime-ktx:3.3.0")
+    implementation('androidx.navigation:navigation-compose:2.7.7')
+
 
     implementation Dependencies.composeUi
-    implementation Dependencies.composeMaterial
+    implementation Dependencies.composeMaterial3
     implementation Dependencies.composePreview
 
 }

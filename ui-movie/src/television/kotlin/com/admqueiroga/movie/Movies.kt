@@ -1,4 +1,4 @@
-@file:OptIn(ExperimentalTvMaterialApi::class, ExperimentalAnimationApi::class)
+@file:OptIn(ExperimentalAnimationApi::class)
 
 package com.admqueiroga.movie
 
@@ -15,6 +15,7 @@ import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Devices
@@ -22,25 +23,32 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.lifecycle.viewmodel.viewModelFactory
 import androidx.tv.foundation.lazy.list.TvLazyColumn
 import androidx.tv.foundation.lazy.list.TvLazyRow
 import androidx.tv.foundation.lazy.list.items
 import androidx.tv.foundation.lazy.list.itemsIndexed
-import androidx.tv.material.ExperimentalTvMaterialApi
-import androidx.tv.material.immersivelist.ImmersiveList
+import androidx.tv.material3.*
 import coil.compose.AsyncImage
-import com.admqueiroga.common.compose.model.asItem
-import com.admqueiroga.data.models.Genre
-import com.admqueiroga.data.models.Movie
+import com.admqueiroga.common.compose.model.Item
+import com.admqueiroga.data.local.MovieDb
+import com.admqueiroga.data.model.GenreWithMovies
+import com.admqueiroga.data.model.Movie
+import com.admqueiroga.data.model.MovieGenre
 
 
 @Composable
 fun Movies(
     onMovieClick: (Long) -> Unit,
-    onMoreClick: (Genre) -> Unit,
+    onMoreClick: (MovieGenre) -> Unit,
 ) {
+    val ctx = LocalContext.current
     Movies(
-        moviesViewModel = viewModel(),
+        moviesViewModel = viewModel(factory = viewModelFactory {
+            addInitializer(MoviesViewModel::class) {
+                MoviesViewModel(MovieDb.getInstance(ctx))
+            }
+        }),
         onMovieClick = onMovieClick,
         onMoreClick = onMoreClick,
     )
@@ -50,7 +58,7 @@ fun Movies(
 fun Movies(
     moviesViewModel: MoviesViewModel,
     onMovieClick: (Long) -> Unit,
-    onMoreClick: (Genre) -> Unit
+    onMoreClick: (MovieGenre) -> Unit
 ) {
     val movies = remember {
         moviesViewModel.moviesByGenre
@@ -58,7 +66,8 @@ fun Movies(
     val featured = remember {
         moviesViewModel.featuredMovies
     }
-    Movies(featured, movies, onMovieClick, onMoreClick)
+//    Movies(featured, movies, onMovieClick, onMoreClick)
+    Movies(emptyList(), movies, onMovieClick, onMoreClick)
 }
 
 @Preview(device = Devices.TABLET)
@@ -76,6 +85,7 @@ fun FeaturedMoviesImmersiveListPreview() {
     FeaturedMoviesImmersiveList(movies) { }
 }
 
+@OptIn(ExperimentalTvMaterial3Api::class)
 @Composable
 fun FeaturedMoviesImmersiveList(movies: List<Movie>, onMovieClick: (Long) -> Unit) {
     ImmersiveList(
@@ -103,7 +113,7 @@ fun FeaturedMoviesImmersiveList(movies: List<Movie>, onMovieClick: (Long) -> Uni
                                     )
                                 }
                             },
-                        model = "https://image.tmdb.org/t/p/original${movie.backdropPath}",
+                        model = "https://image.tmdb.org/t/p/original${movie.posterPath}",
                         contentScale = ContentScale.Crop,
                         contentDescription = null,
                     )
@@ -128,7 +138,7 @@ fun FeaturedMoviesImmersiveList(movies: List<Movie>, onMovieClick: (Long) -> Uni
                             overflow = TextOverflow.Ellipsis,
                         )
                         Text(
-                            text = movie.overview.orEmpty(),
+                            text = movie.title,
                             fontSize = 14.sp,
                             color = Color.White,
                             maxLines = 3
@@ -167,8 +177,8 @@ fun FeaturedMoviesImmersiveList(movies: List<Movie>, onMovieClick: (Long) -> Uni
                 content = {
                     itemsIndexed(movies, { i, _ -> i }) { index, movie ->
                         FocusScalingCard(
-                            modifier = Modifier
-                                .focusableItem(index),
+//                            modifier = Modifier
+//                                .focusableItem(index),
                             onClick = { onMovieClick(movie.id) },
                             shape = RoundedCornerShape(10),
                         ) {
@@ -187,15 +197,16 @@ fun FeaturedMoviesImmersiveList(movies: List<Movie>, onMovieClick: (Long) -> Uni
 
 }
 
+@OptIn(ExperimentalTvMaterial3Api::class)
 @Composable
 fun Movies(
     featured: List<Movie>,
     genres: List<GenreWithMovies>,
     onMovieClick: (Long) -> Unit,
-    onMoreClick: (Genre) -> Unit
+    onMoreClick: (MovieGenre) -> Unit
 ) {
     Column() {
-        FeaturedMoviesImmersiveList(movies = featured, onMovieClick)
+//        FeaturedMoviesImmersiveList(movies = featured, onMovieClick)
         TvLazyColumn(
             modifier = Modifier
                 .fillMaxSize()
@@ -284,4 +295,16 @@ fun Movies(
         }
 
     }
+
+}
+
+fun Movie.asItem(): Item {
+    return Item(
+        id = id,
+        title = this.title,
+        subtitle = "" ?: "Not released",
+        image = "https://image.tmdb.org/t/p/w500$posterPath",
+        backdropImage = "https://image.tmdb.org/t/p/original$posterPath",
+        rating = (voteAverage ?: 0F)
+    )
 }

@@ -1,1 +1,0 @@
-/Users/admqueiroga/workspace/watchout/buildSrc/build/classes/kotlin/main/Dependencies.class:/Users/admqueiroga/workspace/watchout/buildSrc/build/classes/kotlin/main/Versions.class

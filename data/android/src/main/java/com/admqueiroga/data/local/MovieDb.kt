@@ -7,16 +7,23 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.admqueiroga.data.local.dao.*
 import com.admqueiroga.data.model.*
+import com.admqueiroga.data.remote.GenreMovieRemoteKey
+import com.admqueiroga.data.remote.GenreTvShowRemoteKey
 
 @Database(
     entities = [
         Movie::class,
         Movie.Details::class,
-        com.admqueiroga.data.GenreMovieRemoteKey::class,
+        TrendingMovie::class,
         MovieGenre::class,
-        TvShowGenre::class,
         GenreMovieCrossRef::class,
+        GenreMovieRemoteKey::class,
+
+        TvShow::class,
+        TrendingTvShow::class,
+        TvShowGenre::class,
         GenreTvShowCrossRef::class,
+        GenreTvShowRemoteKey::class,
     ],
     exportSchema = false, // TODO: Export
     version = 1
@@ -25,6 +32,7 @@ import com.admqueiroga.data.model.*
 abstract class MovieDb : RoomDatabase() {
 
     abstract fun movieDao(): MovieDao
+    abstract fun tvShowDao(): TvShowDao
     abstract fun movieDetailsDao(): MovieDetailsDao
     abstract fun movieGenreDao(): MovieGenreDao
     abstract fun tvShowGenreDao(): TvShowGenreDao

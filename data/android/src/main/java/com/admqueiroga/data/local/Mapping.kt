@@ -5,12 +5,22 @@ import com.admqueiroga.data.tmdb.model.TmdbMovieDetail
 import com.admqueiroga.data.tmdb.model.TmdbMovieGenre
 import com.admqueiroga.data.tmdb.model.TmdbTvShowGenre
 import com.admqueiroga.data.model.*
+import com.admqueiroga.data.tmdb.model.TmdbTvShow
+
+internal fun mapToTvShow(tvShow: TmdbTvShow) = TvShow(
+    id = tvShow.id,
+    name = tvShow.name ?: "",
+    posterPath = tvShow.posterPath ?: "",
+    voteAverage = tvShow.voteAverage ?: -1F,
+    firstAirDate = tvShow.firstAirDate.orEmpty(),
+)
 
 internal fun mapToMovie(movie: TmdbMovie) = Movie(
     id = movie.id,
     title = movie.title ?: "",
     posterPath = movie.posterPath ?: "",
-    voteAverage = movie.voteAverage ?: -1F
+    voteAverage = movie.voteAverage ?: -1F,
+    releaseDate = movie.releaseDate.orEmpty(),
 )
 
 internal fun mapToMovieDetails(details: TmdbMovieDetail) = Movie.Details(

@@ -11,5 +11,5 @@ data class GenreWithTvShows(
         entityColumn = "tv_show_id",
         associateBy = Junction(GenreTvShowCrossRef::class)
     )
-    val movies: List<TvShowGenre>
+    val movies: List<TvShow>
 )

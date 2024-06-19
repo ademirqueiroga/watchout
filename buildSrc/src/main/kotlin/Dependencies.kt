@@ -1,3 +1,5 @@
+@file:Suppress("ConstPropertyName")
+
 object Dependencies {
 
     const val coroutines = "org.jetbrains.kotlinx:kotlinx-coroutines-core:${Versions.coroutines}"
@@ -6,12 +8,13 @@ object Dependencies {
     const val composeFoundation =
         "androidx.compose.foundation:foundation-layout:${Versions.compose}"
     const val composeMaterial = "androidx.compose.material:material:${Versions.compose}"
+    const val composeMaterial3 = "androidx.compose.material3:material3:1.2.1"
     const val composePreview = "androidx.compose.ui:ui-tooling-preview:${Versions.compose}"
     const val composeUiTooling = "androidx.compose.ui:ui-tooling:${Versions.compose}"
     const val composeConstraintLayout =
         "androidx.constraintlayout:constraintlayout-compose:${Versions.composeConstraintLayout}"
-    const val composeTv = "androidx.tv:tv-foundation:1.0.0-alpha03"
-    const val composeTvMaterial = "androidx.tv:tv-material:1.0.0-alpha03"
+    const val composeTv = "androidx.tv:tv-foundation:1.0.0-alpha10"
+    const val composeTvMaterial = "androidx.tv:tv-material:1.0.0-alpha10"
 
     const val coilCompose = "io.coil-kt:coil-compose:${Versions.coil}"
 

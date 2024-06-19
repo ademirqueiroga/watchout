@@ -2,6 +2,7 @@ package com.admqueiroga.data.model
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
+import androidx.room.Index
 import androidx.room.PrimaryKey
 
 
@@ -13,6 +14,7 @@ data class Movie(
     val posterPath: String,
     val title: String,
     val voteAverage: Float,
+    val releaseDate: String,
 ) {
     @Entity(tableName = "movie_details")
     data class Details(
@@ -30,4 +32,5 @@ data class Movie(
         val budget: Int,
         val runtime: Int,
     )
+
 }

@@ -24,12 +24,16 @@ class TmdbApiClient(token: String = "eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIxNWUxZmExMz
     private val retrofit = Retrofit.Builder()
         .client(okHttpClient)
         .addConverterFactory(moshiConverter)
+        .addConverterFactory(EnumConverterFactory())
         .addCallAdapterFactory(NetworkResponseCallAdapterFactory())
         .baseUrl("https://api.themoviedb.org/")
         .build()
 
+    val search: TmdbApiService.V3.Search = retrofit.create(TmdbApiService.V3.Search::class.java)
+    val trending: TmdbApiService.V3.Trending = retrofit.create(TmdbApiService.V3.Trending::class.java)
     val movies: TmdbApiService.V3.Movies = retrofit.create(TmdbApiService.V3.Movies::class.java)
     val tvShows: TmdbApiService.V3.TvShows = retrofit.create(TmdbApiService.V3.TvShows::class.java)
     val people: TmdbApiService.V3.People = retrofit.create(TmdbApiService.V3.People::class.java)
+    val auth: TmdbApiService.V3.Auth = retrofit.create(TmdbApiService.V3.Auth::class.java)
 
 }

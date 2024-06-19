@@ -12,6 +12,9 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
+import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
+import androidx.compose.material3.adaptive.layout.ListDetailPaneScaffold
+import androidx.compose.material3.adaptive.navigation.rememberListDetailPaneScaffoldNavigator
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -41,7 +44,7 @@ private fun People(model: PeopleViewModel, onPersonClick: (personId: Long) -> Un
     People(people = people, onPersonClick)
 }
 
-@OptIn(ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3AdaptiveApi::class)
 @Composable
 private fun People(people: LazyPagingItems<TmdbPerson>, onPersonClick: (personId: Long) -> Unit) {
     var expansionMap = remember {
@@ -58,7 +61,9 @@ private fun People(people: LazyPagingItems<TmdbPerson>, onPersonClick: (personId
             key = { i -> people[i]!!.id },
             span = { if (expansionMap[people[it]!!.id] == true) GridItemSpan(2) else GridItemSpan(1) }
         ) { i ->
-            PersonCard(people[i], modifier = Modifier.animateItemPlacement().animateContentSize()) { person ->
+            PersonCard(people[i], modifier = Modifier
+                .animateItem()
+                .animateContentSize()) { person ->
                 person?.let {
                     expansionMap[it.id] = expansionMap[it.id] != true
                     onPersonClick(it.id)

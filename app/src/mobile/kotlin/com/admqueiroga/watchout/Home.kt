@@ -1,25 +1,30 @@
 package com.admqueiroga.watchout
 
-import androidx.annotation.DrawableRes
-import androidx.annotation.StringRes
-import androidx.compose.animation.*
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
-import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.BottomAppBar
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Scaffold
-import androidx.compose.material.primarySurface
+import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.admqueiroga.common.compose.ui.BottomNavItem
+
 
 @Composable
 internal fun Home() {
@@ -27,7 +32,7 @@ internal fun Home() {
     Scaffold(
         bottomBar = {
             val currentRoute by navController.currentBackStackEntryAsState()
-            HomeBottomBar(currentRoute?.destination) { selectedTab ->
+            HomeNavigationBar(currentRoute?.destination) { selectedTab ->
                 navController.navigate(selectedTab.screen.route) {
                     launchSingleTop = true
                     restoreState = true
@@ -38,12 +43,12 @@ internal fun Home() {
             }
         }
     ) { paddingValues ->
-        AppNavigation(navController, Modifier.padding(paddingValues))
+        AppNavigation(navController, LocalContext.current, Modifier.padding(paddingValues))
     }
 }
 
 @Composable
-internal fun HomeBottomBar(
+internal fun HomeNavigationBar(
     currentDestination: NavDestination?,
     onTabSelected: (Tab) -> Unit,
 ) {
@@ -52,17 +57,22 @@ internal fun HomeBottomBar(
         enter = fadeIn() + slideInVertically { it },
         exit = fadeOut() + slideOutVertically { it }
     ) {
-        BottomAppBar(
-            backgroundColor = MaterialTheme.colors.primarySurface.copy(alpha = 0.5f),
-            contentPadding = WindowInsets.navigationBars.asPaddingValues(),
-        ) {
+        NavigationBar {
             HomeTabs.forEach { tab ->
-                BottomNavItem(
-                    labelRes = tab.labelRes,
-                    iconRes = tab.iconRes,
-                    selected = currentDestination?.hierarchy?.any { it.route == tab.screen.route }
-                        ?: false,
-                    onClick = { onTabSelected(tab) }
+                val selected = currentDestination?.hierarchy?.any {
+                    it.route == tab.screen.route
+                } ?: false
+                NavigationBarItem(
+                    selected = selected,
+                    onClick = { onTabSelected(tab) },
+                    label = { Text(stringResource(id = tab.labelRes)) },
+                    icon = {
+                        Image(
+                            painter = painterResource(id = tab.iconRes),
+                            contentDescription = null,
+                            colorFilter = ColorFilter.tint(LocalContentColor.current)
+                        )
+                    }
                 )
             }
         }

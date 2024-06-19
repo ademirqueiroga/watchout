@@ -7,6 +7,7 @@ import com.admqueiroga.data.model.GenreWithMovies
 import com.admqueiroga.data.local.MovieDb
 import com.admqueiroga.data.local.mapToMovie
 import com.admqueiroga.data.model.Movie
+import com.admqueiroga.data.model.TrendingMovie
 import com.admqueiroga.data.tmdb.TmdbApiService
 
 class MovieRepositoryImpl(
@@ -15,6 +16,7 @@ class MovieRepositoryImpl(
 ) : MovieRepository {
 
     private val movieDao = db.movieDao()
+    private val movieGenreDao = db.movieGenreDao()
     private val genreMovieCrossRef = db.genreMovieCrossRefDao()
     private val detailsDao = db.movieDetailsDao()
 
@@ -38,7 +40,8 @@ class MovieRepositoryImpl(
         val cached = movieDao.movies(genreId)
         val dirtyCache = cached?.movies?.isEmpty() == true
         if (dirtyCache) {
-            val moviesPage = api.find(page = 1, genres = genreId.toString()).getOrThrow()
+            // TODO: Handle exceptions
+            val moviesPage = api.discover(page = 1, genres = genreId.toString()).getOrThrow()
             val movies = moviesPage.results.map(::mapToMovie)
             val crossRefs = movies.map { movie ->
                 GenreMovieCrossRef(genreId, movie.id)
@@ -47,9 +50,32 @@ class MovieRepositoryImpl(
                 genreMovieCrossRef.insert(crossRefs)
                 movieDao.insert(movies)
             }
+            val genre = movieGenreDao.get(genreId)
+            return GenreWithMovies(genre, movies)
         }
         return movieDao.movies(genreId)
     }
 
+    override suspend fun trending(timeWindow: TmdbApiService.V3.TimeWindow): List<Movie> {
+        val cachedMovies = movieDao.trending(timeWindow.toString())
+        // TODO: Improve cache invalidation
+        val dirtyCache = cachedMovies.isEmpty()
+        if (dirtyCache) {
+            // TODO: Handle exceptions
+            val moviesPage = api.trending(timeWindow).getOrThrow()
+            val trendingMovies = ArrayList<TrendingMovie>(moviesPage.results.size)
+            val movies = ArrayList<Movie>(moviesPage.results.size)
+            moviesPage.results.forEachIndexed { index, tmdbMovie ->
+                movies.add(mapToMovie(tmdbMovie))
+                trendingMovies.add(TrendingMovie(tmdbMovie.id, index, timeWindow.toString()))
+            }
+            db.withTransaction {
+                movieDao.insert(movies)
+                movieDao.insertTrending(trendingMovies)
+            }
+            return movies
+        }
+        return cachedMovies
+    }
 
 }

@@ -16,10 +16,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
-import com.admqueiroga.data.models.MovieDetail
+import com.admqueiroga.data.model.Movie
 
 @Composable
-fun MovieDetails(detail: MovieDetail) {
+fun MovieDetails(detail: Movie.Details) {
     Row(
         modifier = Modifier
             .fillMaxSize()
@@ -75,11 +75,14 @@ fun MovieDetails(
 ) {
     viewModel.loadDetails()
     val detail by viewModel.details.collectAsState(initial = null)
-    detail?.let { MovieDetails(detail = it) }
+//    detail?.let {
+//        // TODO:
+//        MovieDetails(detail = Movie.Details(detail.id))
+//    }
 }
 
 @Preview(showBackground = true, device = Devices.TABLET)
 @Composable
 fun MovieDetailsPreview() {
-    MovieDetails(detail = MovieDetail.sample)
+//    MovieDetails(detail = MovieDetail.sample)
 }

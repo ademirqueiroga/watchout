@@ -13,6 +13,8 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -26,6 +28,24 @@ private const val TYPE_MORE = 1
 
 @Composable
 fun ItemListRow(
+    title: @Composable () -> Unit,
+    items: List<Item>,
+    itemDisplayCount: Int = 10,
+    onItemClick: (Item) -> Unit,
+    onMoreClick: () -> Unit,
+) {
+    ItemListRow(
+        Modifier,
+        title,
+        items,
+        itemDisplayCount,
+        onItemClick,
+        onMoreClick,
+    )
+}
+
+@Composable
+fun ItemListRow(
     title: String?,
     items: List<Item>,
     itemDisplayCount: Int = 10,
@@ -34,7 +54,16 @@ fun ItemListRow(
 ) {
     ItemListRow(
         modifier = Modifier,
-        title = title,
+        title = title?.let {
+            {
+                Text(
+                    text = title,
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                    maxLines = 1,
+                    fontSize = 24.sp,
+                )
+            }
+        },
         items = items,
         itemDisplayCount = itemDisplayCount,
         onItemClick = onItemClick,
@@ -42,10 +71,11 @@ fun ItemListRow(
     )
 }
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 private fun ItemListRow(
     modifier: Modifier = Modifier,
-    title: String?,
+    title: (@Composable () -> Unit)? = null,
     items: List<Item>,
     itemDisplayCount: Int = 10,
     onItemClick: (Item) -> Unit,
@@ -53,16 +83,13 @@ private fun ItemListRow(
 ) {
     Column(modifier) {
         if (title != null) {
-            Text(
-                text = title,
-                modifier = Modifier.padding(horizontal = 16.dp),
-                maxLines = 1,
-                fontSize = 24.sp,
-            )
-            Spacer(modifier = Modifier.height(8.dp))
+            Column(modifier = Modifier.padding(horizontal = 8.dp)) {
+                title()
+            }
         }
         LazyRow(
-            contentPadding = PaddingValues(horizontal = 16.dp),
+            modifier = Modifier.graphicsLayer(clip = false),
+            contentPadding = PaddingValues(8.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {

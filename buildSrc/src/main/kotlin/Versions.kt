@@ -1,6 +1,8 @@
+@file:Suppress("ConstPropertyName")
+
 object Versions {
     const val coroutines = "1.6.4"
-    const val compose = "1.3.1"
+    const val compose = "1.7.0-beta02"
     const val composeConstraintLayout = "1.0.1"
     const val coil = "2.1.0"
     const val lifecycle = "2.5.1"
