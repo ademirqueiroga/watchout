@@ -3,7 +3,6 @@ plugins {
     id("org.jetbrains.kotlin.android")
     id("org.jetbrains.kotlin.plugin.compose")
 }
-//apply(plugin = "kotlin-android")
 
 android {
     namespace = "com.admqueiroga.common_ui_compose"
@@ -26,6 +25,9 @@ android {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
+    kotlinOptions {
+        jvmTarget = "17"
+    }
 }
 
 //tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
@@ -42,5 +44,9 @@ dependencies {
     implementation(Dependencies.composeFoundation)
     implementation(Dependencies.composeMaterial)
     implementation(Dependencies.coilCompose)
+
     debugImplementation(Dependencies.composeUiTooling)
+    debugImplementation("androidx.compose.ui:ui-test-manifest:${Versions.compose}")
+
+    androidTestImplementation("androidx.compose.ui:ui-test-junit4-android:${Versions.compose}")
 }

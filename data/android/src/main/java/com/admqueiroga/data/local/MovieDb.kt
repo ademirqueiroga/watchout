@@ -26,7 +26,7 @@ import com.admqueiroga.data.remote.GenreTvShowRemoteKey
         GenreTvShowRemoteKey::class,
     ],
     exportSchema = false, // TODO: Export
-    version = 1
+    version = 2
 )
 @TypeConverters(Converters::class)
 abstract class MovieDb : RoomDatabase() {
@@ -52,7 +52,8 @@ abstract class MovieDb : RoomDatabase() {
                 context,
                 MovieDb::class.java,
                 "${context.packageName}-movie-db"
-            ).build()
+            ).fallbackToDestructiveMigration()
+                .build()
             return instance!!
         }
     }

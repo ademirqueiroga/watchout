@@ -62,20 +62,31 @@ class MovieRepositoryImpl(
         val dirtyCache = cachedMovies.isEmpty()
         if (dirtyCache) {
             // TODO: Handle exceptions
-            val moviesPage = api.trending(timeWindow).getOrThrow()
-            val trendingMovies = ArrayList<TrendingMovie>(moviesPage.results.size)
-            val movies = ArrayList<Movie>(moviesPage.results.size)
-            moviesPage.results.forEachIndexed { index, tmdbMovie ->
-                movies.add(mapToMovie(tmdbMovie))
-                trendingMovies.add(TrendingMovie(tmdbMovie.id, index, timeWindow.toString()))
+            val requestedWindowMovies = ArrayList<Movie>(20)
+            TmdbApiService.V3.TimeWindow.entries.forEach { window ->
+                val movies = ArrayList<Movie>(20)
+                val moviesPage = api.trending(window).getOrThrow()
+                val trendingMovies = ArrayList<TrendingMovie>(moviesPage.results.size)
+                moviesPage.results.forEachIndexed { index, tmdbMovie ->
+                    val movie = mapToMovie(tmdbMovie)
+                    movies.add(movie)
+                    if (window == timeWindow) {
+                        requestedWindowMovies.add(movie)
+                    }
+                    trendingMovies.add(TrendingMovie(tmdbMovie.id, index, window.toString()))
+                }
+                db.withTransaction {
+                    movieDao.insert(movies)
+                    movieDao.insertTrending(trendingMovies)
+                }
             }
-            db.withTransaction {
-                movieDao.insert(movies)
-                movieDao.insertTrending(trendingMovies)
-            }
-            return movies
+            return requestedWindowMovies
         }
         return cachedMovies
+    }
+
+    suspend fun delete(genreId: Long) {
+        movieDao.delete(genreId)
     }
 
 }

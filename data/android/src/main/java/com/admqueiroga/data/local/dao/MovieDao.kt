@@ -50,6 +50,9 @@ interface MovieDao {
     @Query("SELECT * FROM movie_genres WHERE genre_id = :genreId")
     suspend fun movies(genreId: Long): GenreWithMovies?
 
+    @Query("DELETE FROM movie_genres WHERE genre_id = :genreId")
+    suspend fun delete(genreId: Long)
+
     @Query(
         """
         SELECT * 

@@ -60,18 +60,25 @@ class TvShowRepositoryImpl(
         val dirtyCache = cachedTvShows.isEmpty()
         if (dirtyCache) {
             // TODO: Handle exceptions
-            val tvShowPage = api.trending(timeWindow).getOrThrow()
-            val trendingTvShows = ArrayList<TrendingTvShow>(tvShowPage.results.size)
-            val tvShows = ArrayList<TvShow>(tvShowPage.results.size)
-            tvShowPage.results.forEachIndexed { index, tmdbTvShow ->
-                tvShows.add(mapToTvShow(tmdbTvShow))
-                trendingTvShows.add(TrendingTvShow(tmdbTvShow.id, index, timeWindow.toString()))
+            val requestedWindowTvShows = ArrayList<TvShow>(20)
+            TmdbApiService.V3.TimeWindow.entries.forEach { window ->
+                val tvShowPage = api.trending(timeWindow).getOrThrow()
+                val trendingTvShows = ArrayList<TrendingTvShow>(tvShowPage.results.size)
+                val tvShows = ArrayList<TvShow>(tvShowPage.results.size)
+                tvShowPage.results.forEachIndexed { index, tmdbTvShow ->
+                    val tvShow = mapToTvShow(tmdbTvShow)
+                    tvShows.add(tvShow)
+                    if (window == timeWindow) {
+                        requestedWindowTvShows.add(tvShow)
+                    }
+                    trendingTvShows.add(TrendingTvShow(tmdbTvShow.id, index, timeWindow.toString()))
+                }
+                db.withTransaction {
+                    tvShowDao.insert(tvShows)
+                    tvShowDao.insertTrending(trendingTvShows)
+                }
             }
-            db.withTransaction {
-                tvShowDao.insert(tvShows)
-                tvShowDao.insertTrending(trendingTvShows)
-            }
-            return tvShows
+            return requestedWindowTvShows
         }
         return cachedTvShows
 

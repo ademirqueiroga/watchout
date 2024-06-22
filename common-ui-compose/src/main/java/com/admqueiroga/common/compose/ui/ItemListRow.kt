@@ -15,6 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -102,12 +103,13 @@ private fun ItemListRow(
             }
             if (items.size > itemDisplayCount) {
                 item(
-                    contentType = TYPE_MORE
+                    contentType = TYPE_MORE,
                 ) {
                     Card(
                         shape = CircleShape,
                         backgroundColor = MaterialTheme.colors.onBackground,
                         onClick = onMoreClick,
+                        modifier = Modifier.testTag(ItemListRow.tagForMore())
                     ) {
                         Image(
                             modifier = Modifier.size(48.dp, 48.dp),
@@ -120,6 +122,12 @@ private fun ItemListRow(
         }
     }
 }
+
+object ItemListRow {
+    fun tagForItem(item: Item) = "item_${item.id}"
+    fun tagForMore() = "item_more"
+}
+
 
 @Preview
 @Composable

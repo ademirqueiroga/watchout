@@ -13,6 +13,7 @@ import androidx.room.PrimaryKey
             parentColumns = ["tv_show_id"],
             childColumns = ["tv_show_id"],
             onDelete = ForeignKey.CASCADE,
+            deferred = true,
         )
     ]
 )

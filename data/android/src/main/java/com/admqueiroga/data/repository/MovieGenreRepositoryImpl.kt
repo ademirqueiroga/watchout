@@ -15,6 +15,7 @@ class MovieGenreRepositoryImpl(
 ) : MovieGenreRepository {
 
     private val movieGenreDao = db.movieGenreDao()
+    private val genreMovieCrossRefDao = db.genreMovieCrossRefDao()
 
     override suspend fun insert(genre: List<MovieGenre>) =
         movieGenreDao.insert(genre)
@@ -26,18 +27,26 @@ class MovieGenreRepositoryImpl(
         return movieGenreDao.get(genreId = genreId)
     }
 
+    suspend fun deleteCrossRefs(genreId: Long) {
+        genreMovieCrossRefDao.deleteByGenre(genreId)
+    }
+
+    suspend fun refresh() {
+        val genresResponse = tmdbApi.genres().getOrThrow()
+        movieGenreDao.insert(genresResponse.genres.map(::mapToMovieGenre))
+    }
+
     override fun flow(): Flow<List<MovieGenre>> = movieGenreDao.flow()
         .onStart {
-            val dirtyCache = true // TODO: Figure out when to invalidate cache
+            val dirtyCache = false // TODO: Figure out when to invalidate cache
             if (dirtyCache) {
                 try {
-                    val genresResponse = tmdbApi.genres().getOrThrow()
-                    movieGenreDao.insert(genresResponse.genres.map(::mapToMovieGenre))
+                    refresh()
                 } catch (e: Exception) {
                     // Ignore
                 }
             }
         }
-        .distinctUntilChanged()
+//        .distinctUntilChanged()
 
 }

@@ -1,16 +1,24 @@
+@file:OptIn(ExperimentalMaterialApi::class)
+
 package com.admqueiroga.movie
 
+import android.graphics.Paint.Align
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
+import androidx.compose.material.pullrefresh.PullRefreshIndicator
+import androidx.compose.material.pullrefresh.pullRefresh
+import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -57,7 +65,7 @@ fun Movies(
     )
 }
 
-@OptIn(ExperimentalFoundationApi::class)
+@ExperimentalMaterialApi
 @Composable
 internal fun Movies(
     moviesViewModel: MoviesViewModel,
@@ -73,31 +81,33 @@ internal fun Movies(
         }
     ) { paddingValues ->
         val movies by moviesViewModel.moviesByGenre.collectAsState(emptyList())
-        LazyColumn(
-            modifier = Modifier
-                .padding(paddingValues)
-                .fillMaxSize(),
-            contentPadding = PaddingValues(vertical = 8.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+        val isRefreshing by moviesViewModel.isRefreshing.collectAsState()
+        val pullRefreshState = rememberPullRefreshState(isRefreshing, { moviesViewModel.refresh() })
+        Box(
+            Modifier.pullRefresh(pullRefreshState)
         ) {
-            items(movies, { it.genre.id }) { genreWithMovies ->
-                ItemListRow(
-                    title = genreWithMovies.genre.name,
-                    items = genreWithMovies.movies.map { it.asItem() },
-                    onItemClick = {
-                        onMovieClick(it.id)
-                    },
-                    onMoreClick = {
-                        onMoreClick(genreWithMovies.genre)
-                    }
-                )
+            LazyColumn(
+                modifier = Modifier
+                    .padding(paddingValues)
+                    .fillMaxSize(),
+                contentPadding = PaddingValues(vertical = 8.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                items(movies, { it.genre.id }) { genreWithMovies ->
+                    ItemListRow(
+                        title = genreWithMovies.genre.name,
+                        items = genreWithMovies.movies.map { it.asItem() },
+                        onItemClick = {
+                            onMovieClick(it.id)
+                        },
+                        onMoreClick = {
+                            onMoreClick(genreWithMovies.genre)
+                        }
+                    )
+                }
             }
-//        if (loading) {
-//            item(-1) {
-//                CircularProgressIndicator(Modifier.padding(24.dp))
-//            }
-//        }
+            PullRefreshIndicator(isRefreshing, pullRefreshState, Modifier.align(Alignment.TopCenter))
         }
     }
 

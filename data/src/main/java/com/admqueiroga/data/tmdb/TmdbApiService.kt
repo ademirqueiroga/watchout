@@ -82,7 +82,7 @@ interface TmdbApiService {
 
             @GET("$V3/trending/movie/{time_window}")
             suspend fun trending(
-                @Path("time_window") timeWindow: TimeWindow = TimeWindow.Day
+                @Path("time_window") timeWindow: TimeWindow = TimeWindow.Day,
             ): NetworkResponse<TmdbPage<TmdbMovie>, TmdbApiError>
 
             @GET("$V3/genre/movie/list")
