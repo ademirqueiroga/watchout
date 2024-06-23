@@ -2,8 +2,6 @@
 
 package com.admqueiroga.movie
 
-import android.graphics.Paint.Align
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -22,7 +20,6 @@ import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -101,7 +98,7 @@ internal fun Movies(
                         onItemClick = {
                             onMovieClick(it.id)
                         },
-                        onMoreClick = {
+                        onShowMoreClick = {
                             onMoreClick(genreWithMovies.genre)
                         }
                     )

@@ -2,94 +2,164 @@
 
 package com.admqueiroga.common.compose.ui
 
-import androidx.annotation.FloatRange
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Card
-import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.SubcomposeLayout
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.BaselineShift
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.admqueiroga.common.compose.model.Item
 import com.admqueiroga.common.compose.theme.WatchOutTheme
 import com.admqueiroga.common_ui_compose.R
 
 
-@Composable
-fun ItemCard(item: Item, onClick: (Item) -> Unit) {
-    Column(modifier = Modifier.width(160.dp).testTag(ItemListRow.tagForItem(item))) {
-        Box(contentAlignment = Alignment.BottomStart) {
+object ItemCardDefaults {
+
+    /**
+     * Composable function to display an image with a score indicator.
+     *
+     * @param url The URL of the image.
+     * @param score The score to display.
+     * @param contentDescription The content description for the image.
+     * @param aspectRatio The aspect ratio of the image.
+     * @param modifier The modifier to be applied to the image.
+     */
+    @Composable
+    fun ImageWithScore(
+        url: String,
+        score: Float,
+        contentDescription: String,
+        aspectRatio: Float,
+        modifier: Modifier = Modifier
+    ) {
+        Box {
             val scoreSize = 40.dp
             Card(
-                modifier = Modifier.padding(bottom = scoreSize / 2).testTag("ItemCard"),
-                onClick = { onClick(item) },
+                modifier = modifier
+                    .padding(bottom = scoreSize / 2)
+                    .testTag("ItemCard"),
             ) {
                 AsyncImage(
-                    model = item.image,
+                    model = url,
                     contentDescription = stringResource(
                         id = R.string.cd_item_image,
-                        formatArgs = arrayOf(item.title)
+                        formatArgs = arrayOf(contentDescription)
                     ),
                     contentScale = ContentScale.Crop,
-                    modifier = Modifier
-                        .aspectRatio(2 / 3f)
-                        .background(Color.Gray),
+                    modifier = modifier.aspectRatio(aspectRatio).background(Color.Gray),
                 )
             }
             ScoreCircularIndicator(
                 modifier = Modifier
-                    .padding(start = 8.dp, end = 8.dp)
+                    .padding(horizontal = 8.dp)
+                    .align(Alignment.BottomStart)
                     .size(scoreSize),
-                score = item.rating * 10
+                scorePercentage = score
             )
         }
-        Column(
-            modifier = Modifier.padding(horizontal = 8.dp),
-        ) {
+
+    }
+
+    /**
+     * Composable function to display details with a title and subtitle.
+     *
+     * @param title The title of the details.
+     * @param subtitle The subtitle of the details.
+     * @param modifier The modifier to apply to the details container.
+     */
+    @Composable
+    fun Details(title: String, subtitle: String, modifier: Modifier = Modifier) {
+        Column(modifier = modifier.padding(8.dp)) {
             Text(
-                text = item.title,
+                text = title,
                 maxLines = 1,
                 fontWeight = FontWeight.Bold,
                 overflow = TextOverflow.Ellipsis,
                 style = MaterialTheme.typography.subtitle1,
             )
             Text(
-                text = item.subtitle,
+                text = subtitle,
                 maxLines = 1,
-                color = Color.Gray,
-                style = MaterialTheme.typography.body2,
+                color = MaterialTheme.colors.onSurface.copy(alpha = 0.6f),
+                style = MaterialTheme.typography.subtitle2,
             )
+        }
+    }
+
+}
+
+/**
+ * A composable that displays an item card with an image, score, title, and subtitle.
+ *
+ * @param item The item to display.
+ * @param onClick The callback to be invoked when the item is clicked.
+ * @param modifier The modifier to be applied to the card.
+ * @param imageAspectRatio The aspect ratio of the image.
+ * @param imageContent The content to be displayed in the image area.
+ * @param detailsContent The content to be displayed in the details area.
+ */
+@Composable
+fun ItemCard(
+    item: Item,
+    modifier: Modifier = Modifier,
+    onClick: ((Item) -> Unit)? = null,
+    imageAspectRatio: Float = 2f / 3f,
+    imageContent: @Composable () -> Unit = {
+        val calculatedRatio = remember(imageAspectRatio) {
+            imageAspectRatio
+        }
+        val calculatedScore = remember(item.rating) {
+            item.rating / 10f
+        }
+        ItemCardDefaults.ImageWithScore(
+            url = item.image,
+            contentDescription = item.title,
+            score = calculatedScore,
+            aspectRatio = calculatedRatio,
+            modifier = if (onClick != null) Modifier.clickable { onClick(item) } else Modifier
+        )
+    },
+    detailsContent: @Composable () -> Unit = {
+        ItemCardDefaults.Details(
+            title = item.title,
+            subtitle = item.subtitle
+        )
+    },
+) {
+    SubcomposeLayout(modifier = modifier) { constraints ->
+        val imagePlaceable = subcompose("image") {
+            imageContent()
+        }[0].measure(constraints)
+        val detailsPlaceable = subcompose("details") {
+            detailsContent()
+        }[0].measure(Constraints.fixedWidth(imagePlaceable.width))
+
+        layout(
+            width = imagePlaceable.width,
+            height = imagePlaceable.height + detailsPlaceable.height,
+        ) {
+            imagePlaceable.placeRelative(0, 0)
+            detailsPlaceable.placeRelative(0, imagePlaceable.height)
         }
     }
 }
@@ -100,9 +170,13 @@ fun ItemCardPreview() {
     WatchOutTheme {
         ItemCard(
             item = Item(
-                title = "Preview",
-                backdropImage = ""
-            )
-        ) {}
+                title = "Trigger Warning",
+                subtitle = "Jun 21, 2024",
+                rating = 5.5f,
+                image = ""
+            ),
+            onClick = {},
+            modifier = Modifier.background(Color.White)
+        )
     }
 }

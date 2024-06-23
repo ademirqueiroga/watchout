@@ -14,17 +14,12 @@ import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.LocalTextStyle
 import androidx.compose.material.Text
-import androidx.compose.material.pullrefresh.PullRefreshIndicator
-import androidx.compose.material.pullrefresh.pullRefresh
-import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -129,7 +124,7 @@ private fun DiscoverContentRow(
             title = title,
             items = items,
             onItemClick = { onItemClick(it.id) },
-            onMoreClick = {}
+            onShowMoreClick = {},
         )
     }
 }
@@ -260,7 +255,7 @@ private fun TrendingMoviesList(trendingMovies: List<TmdbMovie>) {
                     rating = movie.voteAverage ?: 0f,
                     backdropImage = "https://image.tmdb.org/t/p/w500${movie.posterPath}",
                 )
-            ) {}
+            )
         }
     }
 }
@@ -278,7 +273,7 @@ private fun TrendingTvShowsList(trendingTvShows: List<TmdbTvShow>) {
                     rating = tvShow.voteAverage ?: 0f,
                     backdropImage = "https://image.tmdb.org/t/p/w500${tvShow.backdropPath}",
                 )
-            ) {}
+            )
         }
     }
 }
@@ -296,7 +291,7 @@ private fun TrendingPeopleList(people: List<TmdbPerson>) {
                     rating = person.popularity ?: 0f,
                     backdropImage = "https://image.tmdb.org/t/p/w500${person.profilePath}",
                 )
-            ) {}
+            )
         }
     }
 }

@@ -65,7 +65,7 @@ fun MovieGenreGrid(
             }
             items(items.itemCount) { index ->
                 items[index]?.let { movie ->
-                    ItemCard(item = movie.asItem(), onItemClick)
+                    ItemCard(item = movie.asItem(), onClick = onItemClick)
                 }
             }
         }

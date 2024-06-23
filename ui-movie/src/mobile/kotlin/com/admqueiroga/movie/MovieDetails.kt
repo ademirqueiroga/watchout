@@ -20,9 +20,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.material.Card
-import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.Divider
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -50,7 +47,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.palette.graphics.Palette
 import coil.compose.AsyncImage
 import com.admqueiroga.common.compose.ui.ScoreCircularIndicator
-import com.admqueiroga.data.model.MovieGenre
 import com.admqueiroga.data.tmdb.model.TmdbMovieGenre
 
 @Composable
@@ -110,7 +106,7 @@ fun MovieDetails(
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
                             ScoreCircularIndicator(
-                                score = movie.voteAverage * 10
+                                scorePercentage = movie.voteAverage * 10
                             )
                             Spacer(modifier = Modifier.width(8.dp))
                             Text("User Score", modifier = Modifier.wrapContentSize(Alignment.Center))

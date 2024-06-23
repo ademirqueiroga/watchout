@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="cd_more_items">More items</string>
+    <string name="cd_more_items">Show more items</string>
     <string name="cd_item_image">%s image</string>
 </resources>
