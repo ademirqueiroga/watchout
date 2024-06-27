@@ -76,22 +76,50 @@ fun ItemListRow(
 }
 
 /**
- * Composable function to display a row of items with a title, a maximum number of items to display,
- * and a "Show More" button if there are more items than the maximum.
+ * Composable function to display a row of items.
  *
  * @param items The list of items to display.
- * @param onItemClick The callback to be invoked when an item is clicked.
- * @param onShowMoreClick The callback to be invoked when the "Show More" button is clicked.
- * @param modifier The modifier to be applied to the root element.
- * @param title The optional title to be displayed for the row.
- * @param maxItemsToDisplay The maximum number of items to display before showing the "Show More" button.
+ * @param onItemClick The callback to invoke when an item is clicked.
+ * @param modifier The modifier to apply to the composable.
+ * @param title The title of the row.
  */
 @Composable
 fun ItemListRow(
     items: List<Item>,
     onItemClick: (Item) -> Unit,
-    onShowMoreClick: () -> Unit,
     modifier: Modifier = Modifier,
+    title: (@Composable () -> Unit)? = null,
+) {
+    ItemListRow(
+        items = items,
+        onItemClick = onItemClick,
+        onShowMoreClick = {},
+        modifier = modifier,
+        title = title,
+        maxItemsToDisplay = items.size
+    )
+}
+
+/**
+ * Composable function to display a row of items with a title, a maximum number of items to display,
+ * and a "Show More" button if there are more items than the maximum.
+ *
+ * This function creates a `Column` that contains the title (if provided), and a `LazyRow` that displays
+ * the items. If there are more items than the maximum, a "Show More" button is displayed.
+ *
+ * @param items The list of items to display.
+ * @param onItemClick The callback to be invoked when an item is clicked.
+ * @param modifier The modifier to be applied to the root element.
+ * @param onShowMoreClick The callback to be invoked when the "Show More" button is clicked.
+ * @param title The optional title to be displayed for the row.
+ * @param maxItemsToDisplay The maximum number of items to display before showing the "Show More" button.
+ */
+@Composable
+fun ItemListRow(
+    items: List<Item?>,
+    onItemClick: (Item) -> Unit,
+    modifier: Modifier = Modifier,
+    onShowMoreClick: (() -> Unit)? = null,
     title: (@Composable () -> Unit)? = null,
     maxItemsToDisplay: Int = 10,
 ) {
@@ -109,12 +137,12 @@ fun ItemListRow(
         ) {
             items(
                 count = minOf(items.size, maxItemsToDisplay),
-                key = { index -> items[index].id },
+                key = { index -> items[index]?.id ?: index },
                 contentType = { TYPE_ITEM }
             ) { index ->
                 ItemCard(item = items[index], onClick = onItemClick)
             }
-            if (items.size > maxItemsToDisplay) {
+            if (items.size > maxItemsToDisplay && onShowMoreClick != null) {
                 item(contentType = TYPE_MORE) {
                     Column(modifier = Modifier.padding(horizontal = 8.dp)) {
                         ShowMoreButton(onClick = onShowMoreClick)
@@ -134,7 +162,7 @@ fun ItemListRow(
  * @param onClick The callback to be invoked when the button is clicked.
  */
 @Composable
-fun ShowMoreButton(modifier: Modifier = Modifier, onClick: () -> Unit) {
+private fun ShowMoreButton(modifier: Modifier = Modifier, onClick: () -> Unit) {
     Card(
         modifier = modifier.testTag(ItemListRow.tagForMore()),
         shape = CircleShape,

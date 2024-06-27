@@ -2,21 +2,36 @@
 
 package com.admqueiroga.common.compose.ui
 
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.SubcomposeLayout
@@ -72,8 +87,7 @@ object ItemCardDefaults {
             ScoreCircularIndicator(
                 modifier = Modifier
                     .padding(horizontal = 8.dp)
-                    .align(Alignment.BottomStart)
-                    .size(scoreSize),
+                    .align(Alignment.BottomStart),
                 scorePercentage = score
             )
         }
@@ -120,7 +134,7 @@ object ItemCardDefaults {
  */
 @Composable
 fun ItemCard(
-    item: Item,
+    item: Item?,
     modifier: Modifier = Modifier,
     onClick: ((Item) -> Unit)? = null,
     imageAspectRatio: Float = 2f / 3f,
@@ -128,22 +142,55 @@ fun ItemCard(
         val calculatedRatio = remember(imageAspectRatio) {
             imageAspectRatio
         }
-        val calculatedScore = remember(item.rating) {
-            item.rating / 10f
+        if (item == null) {
+            Card(
+                modifier = modifier
+                    .size(200.dp, 280.dp)
+                    .padding(bottom = 40.dp / 2)
+                    .testTag("ItemCard"),
+            ){
+                Box(modifier.background(Color.Gray))
+            }
+        } else {
+            val calculatedScore = remember(item.rating) {
+                item.rating / 10f
+            }
+            ItemCardDefaults.ImageWithScore(
+                url = item.image,
+                contentDescription = item.title,
+                score = calculatedScore,
+                aspectRatio = calculatedRatio,
+                modifier = if (onClick != null) Modifier.clickable { onClick(item) } else Modifier
+            )
         }
-        ItemCardDefaults.ImageWithScore(
-            url = item.image,
-            contentDescription = item.title,
-            score = calculatedScore,
-            aspectRatio = calculatedRatio,
-            modifier = if (onClick != null) Modifier.clickable { onClick(item) } else Modifier
-        )
     },
     detailsContent: @Composable () -> Unit = {
-        ItemCardDefaults.Details(
-            title = item.title,
-            subtitle = item.subtitle
-        )
+        if (item == null) {
+            Column(modifier = modifier.padding(8.dp)) {
+                Text(
+                    text = "",
+                    fontWeight = FontWeight.Bold,
+                    style = MaterialTheme.typography.subtitle1,
+                    modifier = Modifier
+                        .fillMaxWidth(0.8f)
+                        .padding(vertical = 2.dp)
+                        .background(Color.Gray, shape = RoundedCornerShape(4.dp))
+                )
+                Text(
+                    text = "",
+                    style = MaterialTheme.typography.subtitle2,
+                    modifier = Modifier
+                        .fillMaxWidth(0.5f)
+                        .padding(vertical = 2.dp)
+                        .background(Color.Gray, shape = RoundedCornerShape(4.dp))
+                )
+            }
+        } else {
+            ItemCardDefaults.Details(
+                title = item.title,
+                subtitle = item.subtitle
+            )
+        }
     },
 ) {
     SubcomposeLayout(modifier = modifier) { constraints ->
