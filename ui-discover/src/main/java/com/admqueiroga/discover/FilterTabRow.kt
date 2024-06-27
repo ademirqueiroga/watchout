@@ -52,47 +52,63 @@ data class FilterPosition(
 )
 
 @Composable
+fun FilterTabItem(
+    text: String,
+    isSelected: Boolean,
+    selectedTextBrush: Brush,
+    unselectedTextBrush: Brush,
+    onClick: () -> Unit
+) {
+    Text(
+        modifier = Modifier
+            .padding(horizontal = 24.dp, vertical = 8.dp)
+            .clickable(
+                interactionSource = remember(isSelected) { MutableInteractionSource() },
+                indication = null,
+                onClick = { onClick() }
+            ),
+        fontWeight = FontWeight.SemiBold,
+        text = text,
+        style = TextStyle(
+            brush = when (isSelected) {
+                true -> selectedTextBrush
+                else -> unselectedTextBrush
+            }
+        )
+    )
+}
+
+@Composable
 fun FilterTabRow(
-    modifier: Modifier,
     filters: List<String>,
     selectedTabIndex: Int,
     onFilterSelected: (Int) -> Unit,
-    tabs: @Composable () -> Unit = {
+    modifier: Modifier = Modifier,
+    tabContent: @Composable () -> Unit = {
         val gradientColors = listOf(Color(0xFFc0fecf), Color(0xFF1ed5a9))
+        val unselectedTextColor = Color(0xFF032541)
         filters.fastForEachIndexed { index, filter ->
-            Text(
-                modifier = Modifier
-                    .padding(horizontal = 24.dp, vertical = 8.dp)
-                    .clickable(
-                        interactionSource = remember { MutableInteractionSource() },
-                        indication = null,
-                        onClick = { onFilterSelected(index) }
-                    ),
-                fontWeight = FontWeight.SemiBold,
+            FilterTabItem(
                 text = filter,
-                style = TextStyle(
-                    brush = if (selectedTabIndex == filters.indexOf(filter)) Brush.linearGradient(
-                        colors = gradientColors
-                    ) else SolidColor(
-                        if (index == selectedTabIndex) gradientColors[0] else Color(
-                            0xFF032541
-                        )
-                    )
-                )
+                isSelected = selectedTabIndex == index,
+                selectedTextBrush = Brush.linearGradient(colors = gradientColors),
+                unselectedTextBrush = SolidColor(unselectedTextColor),
+                onClick = { onFilterSelected(index) }
             )
         }
     }
 ) {
+    val borderColor = Color(0xFF032541)
     Surface(
         modifier = modifier.selectableGroup(),
         shape = CircleShape,
-        border = BorderStroke(1.dp, Color(0xFF032541)),
+        border = BorderStroke(1.dp, borderColor),
         elevation = 1.dp
     ) {
         SubcomposeLayout(
             modifier = Modifier.wrapContentWidth()
         ) { constraints ->
-            val tabMeasurables = subcompose(FilterSlots.Tabs, tabs)
+            val tabMeasurables = subcompose(FilterSlots.Tabs, tabContent)
             val tabPlaceables = tabMeasurables.fastMap { measurable ->
                 measurable.measure(constraints)
             }
@@ -111,7 +127,7 @@ fun FilterTabRow(
                         modifier = Modifier
                             .tabIndicatorOffset(tabPositions[selectedTabIndex])
                             .fillMaxHeight()
-                            .background(Color(0xFF032541), CircleShape)
+                            .background(borderColor, CircleShape)
                     )
                 }.fastForEach {
                     it.measure(Constraints.fixed(tabRowWidth, tabRowHeight))
