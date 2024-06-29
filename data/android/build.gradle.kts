@@ -17,16 +17,19 @@ android {
 
     buildTypes {
         release {
-            buildConfigField("String", "TMDB_TOKEN", "\"${System.getenv("TMDB_API_TOKEN")}\"")
 //            isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
         }
-        debug {
-            buildConfigField("String", "TMDB_TOKEN", "\"${System.getenv("TMDB_API_TOKEN")}\"")
-        }
+    }
+    kotlinOptions {
+        jvmTarget = "17"
+        freeCompilerArgs = listOf(
+            "-Xjvm-default=all",
+            "-Xcontext-receivers",
+        )
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
@@ -43,4 +46,6 @@ dependencies {
     implementation(Dependencies.roomPaging)
     ksp(Dependencies.moshiCodeGen)
     ksp(Dependencies.roomCompiler)
+    implementation("androidx.datastore:datastore-preferences:1.0.0")
+    implementation("androidx.datastore:datastore-preferences-core:1.0.0")
 }

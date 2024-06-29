@@ -76,7 +76,7 @@ internal fun AppNavigation(navController: NavHostController, context: Context, m
         startDestination = Screen.Discover.route,
     ) {
         addDiscoverTopLevel(navController, context)
-        addMoviesTopLevel(navController)
+        addMoviesTopLevel(navController, context)
         addTvShowsTopLevel(navController)
         addPeopleTopLevel(navController)
     }
@@ -130,18 +130,18 @@ private fun NavGraphBuilder.addDiscover(navController: NavHostController, root: 
     }
 }
 
-private fun NavGraphBuilder.addMoviesTopLevel(navController: NavHostController) {
+private fun NavGraphBuilder.addMoviesTopLevel(navController: NavHostController, context: Context) {
     navigation(
         route = Screen.Movies.route,
         startDestination = LeafScreen.Movies.createRoute(Screen.Movies),
     ) {
-        addMovies(navController, Screen.Movies)
+        addMovies(navController, Screen.Movies, context)
         addMovieDetail(Screen.Movies)
         addGenreMovies(navController, Screen.Movies)
     }
 }
 
-private fun NavGraphBuilder.addMovies(navController: NavHostController, root: Screen) {
+private fun NavGraphBuilder.addMovies(navController: NavHostController, root: Screen, context: Context) {
     composable(route = LeafScreen.Movies.createRoute(root)) {
         Movies(
             onMovieClick = { movieId ->
@@ -150,6 +150,13 @@ private fun NavGraphBuilder.addMovies(navController: NavHostController, root: Sc
             onMoreClick = { genre ->
                 navController.navigate(LeafScreen.Genre.createRoute(root, genre.id))
             },
+            onUserAuthRequested = { requestToken ->
+                val intent = Intent().apply {
+                    action = Intent.ACTION_VIEW
+                    setData(Uri.parse("https://www.themoviedb.org/authenticate/$requestToken?redirect_to=watchout://watchout.com"))
+                }
+                context.startActivity(intent)
+            }
         )
     }
 }
