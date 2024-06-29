@@ -1,23 +1,18 @@
 package com.admqueiroga.movie
 
-import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.admqueiroga.data.NetworkResponse
 import com.admqueiroga.data.local.MovieDb
-import com.admqueiroga.data.model.MovieGenre
 import com.admqueiroga.data.repository.MovieGenreRepositoryImpl
 import com.admqueiroga.data.repository.MovieRepositoryImpl
 import com.admqueiroga.data.tmdb.TmdbApiClient
-import com.admqueiroga.data.tmdb.model.TmdbNewSessionRequest
+import com.admqueiroga.data.tmdb.model.TmdbAccount
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flatMapMerge
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -55,6 +50,13 @@ class MoviesViewModel(
     suspend fun authenticate(): String? {
         return when (val token = tmdb.auth.newToken()) {
             is NetworkResponse.Success -> token.body.requestToken
+            else -> null
+        }
+    }
+
+    suspend fun accountDetails(sessionId: String): TmdbAccount? {
+        return when (val details = tmdb.account.details(sessionId)) {
+            is NetworkResponse.Success -> details.body
             else -> null
         }
     }

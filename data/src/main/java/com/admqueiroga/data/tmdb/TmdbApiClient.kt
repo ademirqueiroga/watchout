@@ -35,5 +35,6 @@ class TmdbApiClient(token: String = "eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIxNWUxZmExMz
     val tvShows: TmdbApiService.V3.TvShows = retrofit.create(TmdbApiService.V3.TvShows::class.java)
     val people: TmdbApiService.V3.People = retrofit.create(TmdbApiService.V3.People::class.java)
     val auth: TmdbApiService.V3.Auth = retrofit.create(TmdbApiService.V3.Auth::class.java)
+    val account: TmdbApiService.V3.Account = retrofit.create(TmdbApiService.V3.Account::class.java)
 
 }

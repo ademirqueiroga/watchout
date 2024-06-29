@@ -1,6 +1,7 @@
 package com.admqueiroga.data.tmdb
 
 import com.admqueiroga.data.NetworkResponse
+import com.admqueiroga.data.tmdb.model.TmdbAccount
 import com.admqueiroga.data.tmdb.model.TmdbMovie
 import com.admqueiroga.data.tmdb.model.TmdbMovieDetail
 import com.admqueiroga.data.tmdb.model.TmdbMovieGenre
@@ -159,6 +160,13 @@ interface TmdbApiService {
             @POST("$V3/authentication/session/new")
             suspend fun newSession(request: TmdbNewSessionRequest): NetworkResponse<TmdbSession, TmdbApiError>
 
+        }
+
+        interface Account {
+            @GET("$V3/account")
+            suspend fun details(
+                @Query("session_id") sessionId: String,
+            ): NetworkResponse<TmdbAccount, TmdbApiError>
         }
 
     }
