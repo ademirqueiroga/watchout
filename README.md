@@ -52,11 +52,3 @@ The application is built with a modular architecture:
 The project is structured with the following product flavors:
 - **television**: Optimized for Android TV
 - **mobile**: Optimized for mobile devices
-
-## License
-
-[License information would go here]
-
-## Credits
-
-Developed by [admqueiroga] 
